@@ -21,7 +21,7 @@ class BlockChain {
     }
 
     createGenesisBlock(){
-        return new Block(0,"01/01/2017","Genesis Block","0");
+        return new Block(0,Date.now(),"Genesis Block","0");
     }
     getLatestBlock(){
         return this.chain[this.chain.length-1];
@@ -31,18 +31,31 @@ class BlockChain {
         newBlock.hash = newBlock.calculateHash();
         this.chain.push(newBlock);
     }
+    isChainValid(){
+        for(let i = 1 ; i<this.chain.length; i++){
+            const currentBlock = this.chain[i];
+            const previousBlock = this.chain[i-1];
+            if(currentBlock.hash !== currentBlock.calculateHash()){
+                return false;
+            }
+            if(currentBlock.previousHash !== previousBlock.hash){
+                return false;
+            }
+            return true;
+        }
+    }
 }
 
 router.get('/',(req,res) => {
     let coin = new BlockChain();
-    coin.addBlock(new Block(1,"10/01/2019",{amount: 4}));
-    coin.addBlock(new Block(2,"13/01/2019",{amount: 7}));
-    coin.addBlock(new Block(2,"16/01/2019",{amount: 10}));
-    coin.addBlock(new Block(2,"19/02/2019",{amount: 30}));
+    coin.addBlock(new Block(1,Date.now(),{amount: 4}));
+    coin.addBlock(new Block(2,Date.now(),{amount: 7}));
+    coin.addBlock(new Block(2,Date.now(),{amount: 10}));
+    coin.addBlock(new Block(2,Date.now(),{amount: 30}));
+    // coin.chain[1].data = {amount: 400};
+    console.log(`Is BlockChain valid?`, coin.isChainValid());
     res.status(200).json({
-        body: {
-            data: coin
-        }
+        body: coin
     });
 });
 
